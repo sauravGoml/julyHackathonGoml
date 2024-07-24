@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from .database import Base, engine, SessionLocal
-from .models import DepartmentTbl, EmployeeTbl
-from .schema import DepartmentResponse, DepartmentCreate, EmployeeResponse, EmployeeCreate
-from .utils import send_mail, post_linkdin_imges
+from database import Base, engine, SessionLocal
+from models import DepartmentTbl, EmployeeTbl
+from schema import DepartmentResponse, DepartmentCreate, EmployeeResponse, EmployeeCreate
+from utils import send_mail, post_linkdin_imges
+import uvicorn
 
 Base.metadata.create_all(bind=engine)
 
@@ -77,3 +78,6 @@ async def delete_employee(employee_id: int, db: Session = Depends(get_db)):
     db.delete(employee)
     db.commit()
     return employee
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
