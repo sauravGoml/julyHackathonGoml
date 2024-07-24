@@ -49,8 +49,9 @@ async def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db
     await send_mail(to_email=[db_employee.email], user_obj=db_employee, mail_subject="", content="")
 
     # Notify department manager (placeholder)
-    employee = db.query(EmployeeTbl).filter(EmployeeTbl.department_id == employee.department_id, EmployeeTbl.is_manager == True).first()
-    await send_mail(to_email=[employee.email], user_obj=db_employee, mail_subject="", content="")
+    manager = db.query(EmployeeTbl).filter(EmployeeTbl.department_id == employee.department_id, EmployeeTbl.is_manager == True).first()
+    if manager is not None:
+        await send_mail(to_email=[manager.email], user_obj=db_employee, mail_subject="", content="")
 
     # Announce on social media (placeholder, using a dummy URL)
     text_content = f"Welcome {db_employee.first_name} {db_employee.last_name} to our department!"
@@ -70,7 +71,7 @@ async def read_employee(employee_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Employee not found")
     return employee
 
-@app.delete("/employees/{employee_id}", response_model=EmployeeResponse)
+@app.delete("/delete_employees/{employee_id}", response_model=EmployeeResponse)
 async def delete_employee(employee_id: int, db: Session = Depends(get_db)):
     employee = db.query(EmployeeTbl).filter(EmployeeTbl.id == employee_id).first()
     if employee is None:
